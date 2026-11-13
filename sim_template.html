@@ -1,0 +1,274 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>仮想売買シミュレーター</title>
+<style>__CSS__
+.box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:12px 0}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.row label{display:flex;flex-direction:column;font-size:.8rem;color:var(--muted);gap:3px}
+input,select{font:inherit;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);min-width:0}
+input[type=number]{width:120px}#code{width:110px}
+button{font:inherit;padding:7px 14px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer}
+button.sub{background:transparent;color:var(--accent)}button.mini{padding:3px 9px;font-size:.8rem}
+button:disabled{opacity:.5;cursor:default}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.kpi div{background:var(--chip);border-radius:10px;padding:8px 10px}.kpi b{display:block;font-size:1.15rem}
+.msg{margin-top:8px;font-size:.9rem}.err{color:var(--down)}
+table{width:100%;border-collapse:collapse;font-size:.88rem}th,td{padding:6px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+</style></head><body><main>
+<p><a href="./">← スキャナーに戻る</a></p>
+<h1>🧪 仮想売買シミュレーター</h1>
+<p class="muted">本物のお金を使わずに、スキャナーのルールどおり売買を練習できます。毎営業日夕方の更新データで
+損切り (逆指値) の引き上げ・損切り・期限での売却を自動で処理します。記録は<b>このブラウザの中だけ</b>に保存されます
+(別の端末とは共有されません。下の「バックアップ」で書き出し・読み込みできます)。</p>
+<div id="localWarn"></div>
+<div id="phase"></div>
+
+<div class="box"><div class="kpi" id="kpi"></div></div>
+
+<h2>買い注文</h2>
+<div class="box">
+ <div class="row">
+  <label>銘柄コード<input id="code" list="names" placeholder="例 7203" autocomplete="off"></label>
+  <button class="sub" id="load">読み込み</button>
+  <span id="info" class="muted"></span>
+ </div>
+ <datalist id="names"></datalist>
+ <div id="orderForm" style="display:none;margin-top:12px">
+  <div class="row">
+   <label>注文方法<select id="mode">
+     <option value="open">翌営業日の寄付きで買う (ルールどおり)</option>
+     <option value="price">指定した価格で買った (ザラ場で買った場合)</option></select></label>
+   <label>買値 (指定時)<input type="number" id="price" step="0.1"></label>
+   <label>株数<input type="number" id="shares" min="1" step="1"></label>
+   <label>単位<select id="lot"><option value="1">1株単位 (単元未満株)</option><option value="100">100株単位</option></select></label>
+   <button id="buy">注文する</button>
+  </div>
+  <div class="msg muted" id="calc"></div>
+ </div>
+ <div class="msg" id="buyMsg"></div>
+</div>
+
+<h2>注文中</h2><div class="tw" id="pending"></div>
+<h2>保有中</h2>
+<p class="muted">「今の逆指値」は前日終値までのデータで計算したものです。最長 __MAXD__ 営業日で自動的に売却されます。</p>
+<div class="tw" id="open"></div>
+<h2>売買履歴</h2><div class="tw" id="closed"></div>
+
+<h2>設定・バックアップ</h2>
+<div class="box">
+ <div class="row">
+  <label>初期資金 (円)<input type="number" id="cap" step="10000" min="1000"></label>
+  <button class="sub" id="saveCap">資金を変更</button>
+  <button class="sub" id="export">バックアップを書き出す</button>
+  <label class="sub">バックアップを読み込む<input type="file" id="import" accept="application/json"></label>
+  <button class="sub" id="reset">全てリセット</button>
+ </div>
+ <div class="msg" id="setMsg"></div>
+</div>
+<p class="muted">ルール: 最初の損切り = 買値 − ATR×__STOPK__ / 毎日「買ってからの最高終値 − ATR×__TRAILK__」まで引き上げ (下げない) /
+最長 __MAXD__ 営業日 / 寄付きが逆指値を下回ったら寄付きで約定 / 手数料・スリッページとして往復 __COST__% を差し引き。
+データ日付 __DATE__。</p>
+</main>
+<script>
+const CFG = __CFG_JSON__;
+const KEY = 'swing-sim-v1';
+const $ = id => document.getElementById(id);
+const yen = v => (v < 0 ? '-' : '') + Math.round(Math.abs(v)).toLocaleString('ja-JP') + '円';
+const sgn = v => (v >= 0 ? '+' : '') + Math.round(v).toLocaleString('ja-JP') + '円';
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cache = {};
+
+function load() {
+  let s = null;
+  try { s = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+  return s && s.trades ? s : {cap: CFG.budget, trades: [], seq: 1};
+}
+let S = load();
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { $('setMsg').textContent = '保存できませんでした (プライベートモード等)'; } }
+
+const LOCAL = location.protocol === 'file:';
+async function bars(code) {
+  if (cache[code]) return cache[code];
+  if (LOCAL) throw new Error('パソコン内のファイルを直接開いているため株価データを読み込めません。GitHub Pages のURL (https://～.github.io/swing-scanner/sim.html) で開いてください');
+  let r;
+  try { r = await fetch('p/' + encodeURIComponent(code) + '.json', {cache: 'no-cache'}); }
+  catch (e) { throw new Error('通信エラーで株価データを読み込めませんでした。少し待って再読み込みしてください'); }
+  if (!r.ok) {
+    const any = await fetch('p/_names.json', {cache: 'no-cache'}).then(x => x.ok).catch(() => false);
+    throw new Error(any ? `銘柄コード ${code} のデータがありません (東証の4桁コードか確認してください。売買が少なすぎる銘柄は対象外です)`
+                        : '株価データがまだ作られていません。GitHub の Actions → swing-scan → Run workflow で mode=full を実行してください (約5分)');
+  }
+  return (cache[code] = await r.json());
+}
+
+// スキャナー (scan.py run_trade) と同じ売買ルールで、注文から現在までを再計算する
+function simulate(t, b) {
+  const k = b.d.findIndex(d => d > t.orderDate);
+  if (k < 0) {
+    // 指定価格で買った注文は、その日のデータが届く前から保有中として扱う
+    if (t.mode === 'price') {
+      const n = b.d.length - 1;
+      return {status: 'open', entry: t.price, buyDate: '本日', stop: t.price - CFG.stop_atr * (b.a[n] || t.atr),
+              last: t.price, lastDate: '買値', days: 0};
+    }
+    return {status: 'pending'};
+  }
+  const atr0 = b.a[k - 1] > 0 ? b.a[k - 1] : t.atr;
+  const entry = t.mode === 'price' ? t.price : b.o[k];
+  let stop = entry - CFG.stop_atr * atr0, hi = entry;
+  const last = k - 1 + CFG.max_hold_days;
+  for (let j = k; j < b.d.length; j++) {
+    const why = stop < entry ? '損切り' : 'トレール決済';
+    let ex = null;
+    if (j > k && b.o[j] <= stop) ex = [b.o[j], why];
+    else if (b.l[j] <= stop) ex = [stop, why];
+    else if (j >= last) ex = [b.c[j], '期限'];
+    if (ex) return {status: 'closed', entry, buyDate: b.d[k], sellDate: b.d[j], sell: ex[0], reason: ex[1], days: j - k + 1};
+    hi = Math.max(hi, b.c[j]);
+    stop = Math.max(stop, hi - CFG.trail_atr * b.a[j]);
+  }
+  const n = b.d.length - 1;
+  return {status: 'open', entry, buyDate: b.d[k], stop, last: b.c[n], lastDate: b.d[n], days: n - k + 1};
+}
+
+const pnl = t => (t.sell - t.entry) * t.shares - t.entry * t.shares * CFG.cost_pct / 100;
+
+async function refresh() {
+  for (const t of S.trades) {
+    if (t.status === 'closed') continue;
+    try {
+      const r = simulate(t, await bars(t.code));
+      Object.assign(t, r);
+    } catch (e) { t.err = String(e.message || e); }
+  }
+  save(); render();
+}
+
+function render() {
+  const closed = S.trades.filter(t => t.status === 'closed');
+  const open = S.trades.filter(t => t.status === 'open');
+  const pend = S.trades.filter(t => t.status === 'pending');
+  const realized = closed.reduce((a, t) => a + pnl(t), 0);
+  const tied = open.reduce((a, t) => a + t.entry * t.shares, 0) + pend.reduce((a, t) => a + t.ref * t.shares, 0);
+  const cash = S.cap + realized - tied;
+  const mv = open.reduce((a, t) => a + t.last * t.shares, 0);
+  const unreal = open.reduce((a, t) => a + (t.last - t.entry) * t.shares, 0);
+  const eq = cash + mv + pend.reduce((a, t) => a + t.ref * t.shares, 0);
+  const wins = closed.filter(t => pnl(t) > 0).length;
+  $('kpi').innerHTML = [
+    ['評価額', yen(eq), eq >= S.cap ? 'up' : 'down'], ['損益合計', sgn(eq - S.cap) + ` (${((eq / S.cap - 1) * 100).toFixed(1)}%)`, eq >= S.cap ? 'up' : 'down'],
+    ['確定損益', sgn(realized), realized >= 0 ? 'up' : 'down'], ['含み損益', sgn(unreal), unreal >= 0 ? 'up' : 'down'],
+    ['現金 (買付余力)', yen(cash), ''], ['勝率', closed.length ? `${Math.round(wins / closed.length * 100)}% (${wins}/${closed.length})` : '—', ''],
+  ].map(([k, v, c]) => `<div><span class="muted">${k}</span><b class="${c}">${v}</b></div>`).join('');
+  S._cash = cash; S._eq = eq;
+
+  $('pending').innerHTML = pend.length ? `<table><thead><tr><th>銘柄</th><th>注文</th><th>株数</th><th>目安金額</th><th></th></tr></thead><tbody>` +
+    pend.map(t => `<tr><td>${esc(t.code)} ${esc(t.name)}${t.err ? `<br><span class="err">${esc(t.err)}</span>` : ''}</td>
+      <td>${t.mode === 'price' ? t.price.toLocaleString() + '円で買付' : '翌営業日 寄付き'}</td><td>${t.shares}</td><td>${yen(t.ref * t.shares)}</td>
+      <td><button class="mini sub" data-cancel="${t.id}">取消</button></td></tr>`).join('') + '</tbody></table>'
+    : '<p class="muted">なし (寄付きで買う注文は、翌営業日の夕方の更新で約定します)</p>';
+
+  $('open').innerHTML = open.length ? `<table><thead><tr><th>銘柄</th><th>買付日</th><th>買値</th><th>株数</th><th>現在値</th><th>損益</th><th>今の逆指値</th><th>保有日数</th><th></th></tr></thead><tbody>` +
+    open.map(t => { const p = (t.last - t.entry) * t.shares; return `<tr><td>${esc(t.code)} ${esc(t.name)}</td><td>${t.buyDate}</td>
+      <td>${t.entry.toLocaleString()}</td><td>${t.shares}</td><td>${t.last.toLocaleString()}<br><span class="muted">${t.lastDate}</span></td>
+      <td class="${p >= 0 ? 'up' : 'down'}">${sgn(p)}<br>${((t.last / t.entry - 1) * 100).toFixed(1)}%</td>
+      <td><b>${Math.round(t.stop).toLocaleString()}</b></td><td>${t.days}/${CFG.max_hold_days}</td>
+      <td><button class="mini sub" data-sell="${t.id}">売る</button></td></tr>`; }).join('') + '</tbody></table>'
+    : '<p class="muted">なし</p>';
+
+  $('closed').innerHTML = closed.length ? `<table><thead><tr><th>銘柄</th><th>買付日</th><th>売却日</th><th>買値</th><th>売値</th><th>株数</th><th>損益</th><th>理由</th></tr></thead><tbody>` +
+    closed.slice().reverse().map(t => { const p = pnl(t); return `<tr><td>${esc(t.code)} ${esc(t.name)}</td><td>${t.buyDate}</td><td>${t.sellDate}</td>
+      <td>${t.entry.toLocaleString()}</td><td>${Math.round(t.sell).toLocaleString()}</td><td>${t.shares}</td>
+      <td class="${p >= 0 ? 'up' : 'down'}">${sgn(p)}</td><td>${esc(t.reason)}</td></tr>`; }).join('') + '</tbody></table>'
+    : '<p class="muted">まだありません</p>';
+  $('cap').value = S.cap;
+}
+
+let cur = null;
+async function loadCode() {
+  const code = $('code').value.trim().toUpperCase();
+  $('buyMsg').textContent = ''; $('orderForm').style.display = 'none'; cur = null;
+  if (!code) return;
+  try {
+    const b = await bars(code), n = b.d.length - 1;
+    cur = {code, name: b.name, close: b.c[n], atr: b.a[n], date: b.d[n]};
+    $('info').innerHTML = `<b>${esc(b.name)}</b> 終値 ${b.c[n].toLocaleString()}円 (${b.d[n]}) ・ ATR ${b.a[n].toFixed(1)}`;
+    if (!$('price').value || $('price').dataset.code !== code) { $('price').value = b.c[n]; $('price').dataset.code = code; }
+    $('orderForm').style.display = '';
+    calc(true);
+  } catch (e) { $('info').innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+}
+
+function calc(setShares) {
+  if (!cur) return;
+  const px = $('mode').value === 'price' ? +$('price').value : cur.close;
+  const lot = +$('lot').value, rps = CFG.stop_atr * cur.atr;
+  const riskYen = S._eq * CFG.phase_risk_pct / 100;
+  const sugg = Math.floor(Math.min(riskYen / rps, S._cash / px) / lot) * lot;
+  if (setShares) $('shares').value = Math.max(sugg, 0);
+  const sh = +$('shares').value;
+  $('calc').innerHTML = `最初の損切り目安 ${Math.round(px - rps).toLocaleString()}円 (−${Math.round(rps).toLocaleString()}円/株) ・ ` +
+    `推奨 ${sugg}株 (1回の許容損失 ${CFG.phase_risk_pct}% = ${yen(riskYen)}) ・ この株数だと 約${yen(sh * px)} / 損切時 −${yen(sh * rps)}` +
+    (sugg < lot ? `<br><span class="err">許容損失の範囲で買える株数がありません (見送り推奨)</span>` : '');
+}
+
+function buy() {
+  if (!cur) return;
+  const sh = Math.floor(+$('shares').value), mode = $('mode').value, px = +$('price').value;
+  const ref = mode === 'price' ? px : cur.close;
+  if (!(sh > 0)) return ($('buyMsg').innerHTML = '<span class="err">株数を入力してください</span>');
+  if (mode === 'price' && !(px > 0)) return ($('buyMsg').innerHTML = '<span class="err">買値を入力してください</span>');
+  if (sh * ref > S._cash) return ($('buyMsg').innerHTML = `<span class="err">現金が足りません (必要 約${yen(sh * ref)} / 現金 ${yen(S._cash)})</span>`);
+  if (S.trades.some(t => t.code === cur.code && t.status !== 'closed')) return ($('buyMsg').innerHTML = '<span class="err">同じ銘柄を保有中・注文中です</span>');
+  S.trades.push({id: S.seq++, code: cur.code, name: cur.name, mode, price: px, shares: sh, ref, atr: cur.atr, orderDate: cur.date, status: 'pending', ordered: new Date().toISOString()});
+  $('buyMsg').innerHTML = `<span class="up">注文しました: ${esc(cur.code)} ${esc(cur.name)} ${sh}株</span>`;
+  refresh();
+}
+
+document.addEventListener('click', e => {
+  const c = e.target.dataset.cancel, s = e.target.dataset.sell;
+  if (c) { S.trades = S.trades.filter(t => String(t.id) !== c); save(); render(); }
+  if (s) {
+    const t = S.trades.find(t => String(t.id) === s);
+    const v = prompt(`${t.code} ${t.name} を売る価格 (円)\n空欄なら最新の終値 ${t.last} 円`, t.last);
+    if (v === null) return;
+    const p = +v || t.last;
+    Object.assign(t, {status: 'closed', sell: p, sellDate: new Date().toISOString().slice(0, 10), reason: '手動売却'});
+    save(); render();
+  }
+});
+$('load').onclick = loadCode;
+$('code').addEventListener('keydown', e => { if (e.key === 'Enter') loadCode(); });
+$('code').addEventListener('change', loadCode);
+['mode', 'lot', 'price'].forEach(id => $(id).addEventListener('change', () => calc(true)));
+$('shares').addEventListener('input', () => calc(false));
+$('buy').onclick = buy;
+$('saveCap').onclick = () => { const v = +$('cap').value; if (v > 0) { S.cap = v; save(); render(); $('setMsg').textContent = '初期資金を変更しました'; } };
+$('reset').onclick = () => { if (confirm('全ての仮想売買の記録を消しますか?')) { S = {cap: CFG.budget, trades: [], seq: 1}; save(); render(); } };
+$('export').onclick = () => {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(S, null, 1)], {type: 'application/json'}));
+  a.download = 'swing-sim-backup.json'; a.click();
+};
+$('import').onchange = async e => {
+  try { const s = JSON.parse(await e.target.files[0].text()); if (!s.trades) throw 0; S = s; save(); refresh(); $('setMsg').textContent = '読み込みました'; }
+  catch (x) { $('setMsg').innerHTML = '<span class="err">読み込めませんでした</span>'; }
+};
+
+if (LOCAL) $('localWarn').innerHTML = '<div class="banner bad">⚠ パソコン内のファイルを直接開いています。この状態では株価データを読み込めないため、シミュレーターは動きません。' +
+  'GitHub に公開した後、<b>https://(GitHubユーザー名).github.io/swing-scanner/sim.html</b> を開いてください。</div>';
+const ph = CFG.phase;
+$('phase').innerHTML = ph.level === 'stop' ? '<div class="banner bad">⛔ 相場判定：停止 — ルール上は新規の買いなし (練習として買うことはできます)</div>'
+  : ph.level === 'caution' ? `<div class="banner warn">🟠 相場判定：注意 — 許容損失 ${CFG.phase_risk_pct}%・同時保有 最大${ph.max_pos}銘柄</div>`
+  : `<div class="banner good">🟢 相場判定：通常 — 許容損失 ${CFG.phase_risk_pct}%・同時保有 最大${ph.max_pos}銘柄</div>`;
+
+fetch('p/_names.json').then(r => r.ok ? r.json() : {}).then(m => {
+  $('names').innerHTML = Object.entries(m).map(([c, n]) => `<option value="${esc(c)}">${esc(n)}</option>`).join('');
+}).catch(() => {});
+render();
+refresh().then(() => {
+  const m = location.hash.match(/buy=([0-9A-Za-z]+)/);
+  if (m) { $('code').value = m[1]; loadCode(); }
+});
+</script>
+</body></html>
