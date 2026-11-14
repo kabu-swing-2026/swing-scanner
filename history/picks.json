@@ -18,5 +18,6 @@
 {"date":"2026-11-13","ticker":"4071.T","code":"4071","name":"プラスアルファ・コンサルティング","strategy":"breakout","rank":7,"score":78.0,"atr":79.852914166528,"signal_close":2501.0,"regime":false,"phase":"caution","buyable":true,"status":"pending"},
 {"date":"2026-11-13","ticker":"2120.T","code":"2120","name":"ＬＩＦＵＬＬ","strategy":"breakout","rank":8,"score":91.3,"atr":9.875922690977866,"signal_close":269.0,"regime":false,"phase":"caution","buyable":true,"status":"pending"},
 {"date":"2026-11-13","ticker":"1379.T","code":"1379","name":"ホクト","strategy":"breakout","rank":9,"score":61.3,"atr":41.618176988920816,"signal_close":2146.0,"regime":false,"phase":"caution","buyable":true,"status":"pending"},
-{"date":"2026-11-13","ticker":"7860.T","code":"7860","name":"エイベックス","strategy":"breakout","rank":10,"score":74.2,"atr":29.83809174106085,"signal_close":1334.0,"regime":false,"phase":"caution","buyable":true,"status":"pending"}
+{"date":"2026-11-13","ticker":"7860.T","code":"7860","name":"エイベックス","strategy":"breakout","rank":10,"score":74.2,"atr":29.83809174106085,"signal_close":1334.0,"regime":false,"phase":"caution","buyable":true,"status":"pending"},
+{"date":"2026-11-13","ticker":"7550.T","code":"7550","name":"ゼンショーホールディングス","strategy":"breakout","rank":2,"score":82.9,"atr":436.81877323949954,"signal_close":13270.0,"regime":false,"phase":"caution","buyable":true,"status":"pending"}
 ]
