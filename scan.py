@@ -49,7 +49,8 @@ INDICES = [("^N225", "日経平均"), ("1306.T", "TOPIX(ETF)"), ("^GSPC", "S&P50
 STRATS = {"pullback": "押し目買い", "breakout": "ブレイクアウト"}
 STRAT_DESC = {
     "pullback": "【メイン戦略】上昇トレンド(25日線>75日線、75日線上向き)の銘柄が25日線まで下げ、反発の陽線が出た日。"
-                "値動きが荒すぎる銘柄(ATRが株価の4%超)は除外し、売買代金の大きい順に表示。",
+                "値動きが荒すぎる銘柄(ATRが株価の4%超)、52週高値から12%以上下がった銘柄、グロース市場の銘柄は除外し、"
+                "売買代金の大きい順に表示。",
     "breakout": "【参考】20日高値を出来高1.5倍以上で上抜けた日。5年間の検証では前半(2021〜24年)の損益がほぼゼロで、"
                 "優位性が安定しないため参考表示です。",
 }
@@ -254,11 +255,15 @@ def add_indicators(d: pd.DataFrame) -> pd.DataFrame:
     d["ret20"] = c / c.shift(20) - 1
     d["ret60"] = c / c.shift(60) - 1
     d["chg"] = c / c.shift(1) - 1
+    d["hi250"] = h.rolling(250, min_periods=120).max()
+    d["below_high"] = c / d.hi250 - 1  # 52週高値からの下落率
     s25, s75 = d.sma25, d.sma75
+    # 52週高値から大きく下がった銘柄は除外 (5年検証で前半・後半とも最も成績が悪いグループ)
+    near_high = c >= d.hi250 * (1 - CFG.get("max_below_high_pct", 12) / 100) if CFG.get("max_below_high_pct") else True
     base = (d.turnover20 >= CFG["min_turnover_yen"]) & (c >= CFG["min_price"])
     trend = (s25 > s75) & (s75 > s75.shift(10)) & (c > s75)
     d["sig_pullback"] = (base & trend & (l.rolling(3).min() <= s25 * 1.01) & (c >= s25 * 0.98)
-                         & (c <= s25 * 1.03) & d.rsi.between(40, 60) & (c > c.shift(1)) & (c > o))
+                         & (c <= s25 * 1.03) & d.rsi.between(40, 60) & (c > c.shift(1)) & (c > o) & near_high)
     d["sig_breakout"] = (base & (s25 > s75) & (c > d.hi20) & (d.vol_ratio >= 1.5)
                          & (c < s25 * 1.12) & (d.rsi < 80) & (c > o))
     return d
@@ -330,7 +335,11 @@ def market_phase(idx_frames: dict) -> dict:
     if p < a200 and a75 < a200:
         level, risk, mp = "stop", 0.0, 0
     elif p < a75 and down75:
-        level, risk, mp = "caution", CFG["caution_risk_pct"], CFG["caution_max_positions"]
+        # 5年検証: この局面の押し目買いは前半・後半とも期待値マイナス → 既定では新規の買いなし
+        if CFG.get("caution_new_buys", False):
+            level, risk, mp = "caution", CFG["caution_risk_pct"], CFG["caution_max_positions"]
+        else:
+            level, risk, mp = "caution", 0.0, 0
     else:
         level, risk, mp = "normal", CFG["risk_per_trade_pct"], CFG["max_positions"]
     detail = (f"日経平均 {p:,.0f} / 75日線 {a75:,.0f} ({'下向き' if down75 else '上向き'}) / 200日線 {a200:,.0f}")
@@ -979,9 +988,14 @@ def render(ctx: dict) -> str:
         banner = ('<div class="banner bad">⛔ <b>相場判定：停止</b> — 日経平均が200日線の下で、75日線も200日線を下回る下げ相場。'
                   '<b>新規の買いは止めて現金で待つ。</b>保有中の銘柄は逆指値に任せる。'
                   f'<br><span class="muted">{esc(ph["detail"])}</span></div>')
+    elif ph["level"] == "caution" and ph["max_pos"] == 0:
+        banner = ('<div class="banner warn">🟠 <b>相場判定：注意</b> — 日経平均が75日線の下で75日線も下向き。'
+                  'この局面の押し目買いは5年検証で期待値マイナス。<b>新規の買いはお休み。</b>'
+                  '保有中の銘柄は逆指値に任せる。下の候補は相場が戻ったときの参考です。'
+                  f'<br><span class="muted">{esc(ph["detail"])}</span></div>')
     elif ph["level"] == "caution":
         banner = ('<div class="banner warn">🟠 <b>相場判定：注意</b> — 日経平均が75日線の下で75日線も下向き。'
-                  f'この局面は押し目買いの期待値がほぼゼロ。<b>1回の許容損失を{ph["risk_pct"]:g}%'
+                  f'この局面は押し目買いの期待値が低い。<b>1回の許容損失を{ph["risk_pct"]:g}%'
                   f'({b * ph["risk_pct"] / 100:,.0f}円)に下げ、同時保有は最大{ph["max_pos"]}銘柄。</b>'
                   '下の株数はこの設定で計算済み。'
                   f'<br><span class="muted">{esc(ph["detail"])}</span></div>')
@@ -1017,7 +1031,9 @@ def render(ctx: dict) -> str:
         else:
             live_banner = (f'<div class="banner info">🕘 {esc(ctx["live_at"])} にチェックしましたが、'
                            '本日の取引データがまだありません (休場日 or 寄付き前)。</div>')
-    rp = ph["risk_pct"] or CFG["caution_risk_pct"]
+    rp = ph["risk_pct"] or CFG["risk_per_trade_pct"]
+    caution_rule = (f"注意＝最大{CFG['caution_max_positions']}銘柄・{CFG['caution_risk_pct']:g}%"
+                    if CFG.get("caution_new_buys") else "注意＝新規の買いなし")
     return f"""<!doctype html><html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>スイング候補スキャナー</title>
 <style>{CSS}</style></head><body><main>
@@ -1047,16 +1063,17 @@ def render(ctx: dict) -> str:
 <li><b>売り方:</b> 旧ルール(利確2倍・10日)は1回あたり期待値 前半+0.03R / 後半+0.09R。トレーリングストップ・最長30日にすると 前半+0.12R / 後半+0.17R と両期間で改善。</li>
 <li><b>除外:</b> ATRが株価の約3.6%を超える値動きの荒い銘柄は、両期間とも最も成績が悪いグループ(+0.03〜0.08R)。</li>
 <li><b>短期の地合い (TOPIX 25日線):</b> 「地合い悪化の日は買わない」は後半2年では有効でしたが、前半3年では逆に成績を悪化させたため使っていません。</li>
-<li><b>相場判定 (日経平均 75日線・200日線):</b> 75日線の下かつ75日線下向きの局面 (期間の約2割) では、押し目買いの1回あたり期待値が +0.18R → +0.02R とほぼゼロ。そのため「注意」では許容損失と同時保有数を減らします。急落で200日線を割った直後の買いはむしろ成績が良かったため、すぐには止めません。「停止」(200日線割れが続き75日線も200日線の下) は、この5年に長期の下げ相場がなく検証できていないため、安全のためのルールです。</li>
+<li><b>相場判定 (日経平均 75日線・200日線):</b> 75日線の下かつ75日線下向きの局面では、押し目買いの1回あたり期待値が 前半−0.06R / 後半−0.71R と両期間でマイナス。そのため「注意」では新規の買いを休みます。急落で200日線を割った直後の買いはむしろ成績が良かったため、すぐには止めません。「停止」(200日線割れが続き75日線も200日線の下) は、この5年に長期の下げ相場がなく検証できていないため、安全のためのルールです。</li>
+<li><b>銘柄の絞り込み (2026年11月追加):</b> 52週高値から12%以上下がった銘柄 (前半+0.02R / 後半+0.10R) とグロース市場の銘柄 (前半−0.01R / 後半−0.14R) は両期間とも成績が悪いため除外。「注意」での買い休みと合わせると、1回あたり期待値は 前半+0.12R→+0.21R / 後半+0.19R→+0.28R に改善。RSI・出来高・ローソク足の形・候補の並び順など10項目以上も試しましたが、前半と後半で効き方が逆になったため採用していません。</li>
 <li><b>保有期間:</b> 日計り(6手法)は全てマイナス、週単位はコストが少し増えるとマイナス。月単位が最も安定 (資金30万・最大5銘柄で年率中央値+14%)。空売り(戻り売り)は下げ局面でもマイナスでした。</li>
-<li><b>5万円・最大3銘柄の試算:</b> 候補が毎日多数出るため、どれを選ぶかの運で結果が大きくぶれます。ランダムに選んだ場合の年率は中央値+7〜8%、10%の確率で年率マイナス、途中の最大下落は15〜30%程度。</li>
+<li><b>5万円・最大3銘柄の試算:</b> 候補が毎日多数出るため、どれを選ぶかの運で結果が大きくぶれます。ランダムに選んだ場合の年率は中央値+11%前後 (下位10%で+5%程度)。資金30万・最大5銘柄なら中央値+16%前後。途中の最大下落は15〜30%程度を覚悟。</li>
 </ul></div>
 <h2>実際の推奨の成績 (フォワードテスト)</h2>
 <p class="muted">毎日、各戦略の上位{CFG['history_picks_per_strategy']}銘柄 (推奨) を自動で記録し、上と同じルールで売買した場合の結果を追跡しています。</p>
 {fwd_section(ctx['hist'])}
 <h2>資金{b:,}円での運用ルール</h2>
 <ol class="rules">
-<li><b>まずページ上部の相場判定を見る。</b>通常＝最大{CFG['max_positions']}銘柄・許容損失{CFG['risk_per_trade_pct']:g}% / 注意＝最大{CFG['caution_max_positions']}銘柄・{CFG['caution_risk_pct']:g}% / 停止＝新規の買いなし (現金で待つ)。</li>
+<li><b>まずページ上部の相場判定を見る。</b>通常＝最大{CFG['max_positions']}銘柄・許容損失{CFG['risk_per_trade_pct']:g}% / {caution_rule} / 停止＝新規の買いなし (現金で待つ)。</li>
 <li><b>買うのは「押し目買い」候補の上位から。</b>朝のザラ場チェックで ◎ のものを、上の保有上限まで。決算発表をまたぐ銘柄は避ける。</li>
 <li><b>1回の損失は資金の{rp:g}%({b * rp / 100:,.0f}円)まで。</b>買ったらすぐ「最初の損切り」に逆指値を入れる。株数はカードの💴の表示どおり (相場判定に合わせて計算済み)。</li>
 <li><b>利確の指値は入れない。</b>毎日夕方このページの「ポジション管理」を見て、逆指値を「明日の逆指値」まで引き上げる (上げるだけ。下げない)。利益が出るほど損切りラインが上がり、利益を守りながら伸ばす。</li>
@@ -1099,10 +1116,11 @@ def notify_discord(ctx: dict) -> None:
     repo = os.environ.get("GITHUB_REPOSITORY", "")
     page = os.environ.get("PAGE_URL") or (f"https://{repo.split('/')[0]}.github.io/{repo.split('/')[1]}/" if "/" in repo else "")
     ph = ctx.get("phase") or {"level": "normal"}
-    regime = {"normal": "🟢 相場判定:通常", "caution": "🟠 相場判定:注意 (許容損失・保有数を減らす)",
+    caution = "(許容損失・保有数を減らす)" if ph.get("max_pos") else "(新規の買いなし)"
+    regime = {"normal": "🟢 相場判定:通常", "caution": f"🟠 相場判定:注意 {caution}",
               "stop": "⛔ 相場判定:停止 (新規の買いなし)"}[ph["level"]]
     if ctx.get("live_at"):
-        if not ctx.get("live_ok") or ph["level"] == "stop":
+        if not ctx.get("live_ok") or ph.get("max_pos") == 0:
             return
         go = [c for c in ctx["cands"] if (c.get("live") or {}).get("status") == "go"]
         lines = [f"**🕘 {ctx['live_at']} ザラ場チェック** {regime}",
@@ -1198,7 +1216,7 @@ def write_price_files(ind: dict, uni: pd.DataFrame) -> None:
 def sim_page(ctx: dict) -> str:
     ph = ctx.get("phase") or {"level": "normal", "risk_pct": CFG["risk_per_trade_pct"], "max_pos": CFG["max_positions"]}
     cfg = {k: CFG[k] for k in ("budget", "stop_atr", "trail_atr", "max_hold_days", "cost_pct")}
-    cfg |= {"phase": ph, "phase_risk_pct": ph["risk_pct"] or CFG["caution_risk_pct"]}
+    cfg |= {"phase": ph, "phase_risk_pct": ph["risk_pct"] or CFG["risk_per_trade_pct"]}
     tpl = (BASE / "sim_template.html").read_text(encoding="utf-8")
     for k, v in (("__CSS__", CSS), ("__CFG_JSON__", json.dumps(cfg, ensure_ascii=False)),
                  ("__MAXD__", str(CFG["max_hold_days"])), ("__STOPK__", f"{CFG['stop_atr']:g}"),
@@ -1249,6 +1267,11 @@ def main() -> None:
                       for t, d in idx_frames.items()}
 
     ind = {t: add_indicators(d) for t, d in frames.items() if len(d) >= WARMUP}
+    if CFG.get("exclude_growth", True):  # グロース市場は5年検証で前半・後半ともマイナス → 押し目買いの対象外
+        growth = set(uni.loc[uni.market.astype(str).str.contains("グロース"), "code"].astype(str))
+        for t, d in ind.items():
+            if t[:-2] in growth:
+                d["sig_pullback"] = False
     last_date = pd.Series([d.index[-1] for d in ind.values()]).mode().max()
     regime = regime_series(idx_frames)
     regime_ok = bool(regime.iloc[-1]) if len(regime) else True
@@ -1264,7 +1287,7 @@ def main() -> None:
     log("バックテスト")
     bt, bt_r = backtest(ind, regime)
     log("候補抽出")
-    cands = make_candidates(ind, uni, last_date, phase["risk_pct"] or CFG["caution_risk_pct"])
+    cands = make_candidates(ind, uni, last_date, phase["risk_pct"] or CFG["risk_per_trade_pct"])
     shown = []
     for key in STRATS:
         shown += [c for c in cands if c["strategy"] == key][:CFG["top_n"]]

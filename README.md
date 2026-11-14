@@ -17,7 +17,7 @@ Web ページ (GitHub Pages) に公開します。PC の電源は不要です。
 スマホでもブラウザから GitHub にログインすれば同じ操作ができます。
 
 ## 表示される情報
-- 相場判定 (日経平均の75日線・200日線で 通常 / 注意 / 停止 の3段階。注意は株数を自動で減らし、停止は新規の買いなし) と主要指数 (日経平均・S&P500・NASDAQ・SOX・VIX・ドル円)
+- 相場判定 (日経平均の75日線・200日線で 通常 / 注意 / 停止 の3段階。注意・停止は新規の買いなし) と主要指数 (日経平均・S&P500・NASDAQ・SOX・VIX・ドル円)
 - 候補銘柄 (押し目買い=メイン / ブレイクアウト=参考)：最初の損切り、資金5万円での買い方 (100株 or 単元未満株の株数)
 - 企業の背景：時価総額・PER・PBR・配当利回り・ROE・増収率・営業利益率、Wikipedia の会社概要、事業内容
 - 推奨銘柄のポジション管理：保有中の推奨銘柄と「明日の逆指値」(トレーリングストップ)
@@ -73,8 +73,11 @@ GitHub の「Settings」→「Secrets and variables」→「Actions」→「New 
 | budget | 運用資金 (円) | 50000 |
 | risk_per_trade_pct | 1回の許容損失 (資金に対する%)・相場判定「通常」時 | 2.0 |
 | max_positions | 同時に持つ銘柄数の上限・「通常」時 | 3 |
-| caution_risk_pct | 相場判定「注意」時の許容損失 (%) | 1.0 |
-| caution_max_positions | 相場判定「注意」時の保有上限 | 2 |
+| caution_new_buys | 相場判定「注意」時に新規の買いをするか (false = 買わない) | false |
+| caution_risk_pct | caution_new_buys が true のときの許容損失 (%) | 1.0 |
+| caution_max_positions | caution_new_buys が true のときの保有上限 | 2 |
+| exclude_growth | グロース市場の銘柄を押し目買いの対象外にする | true |
+| max_below_high_pct | 52週高値からこの%以上下がった銘柄を除外 | 12 |
 | min_turnover_yen | 最低売買代金 (20日平均) | 5000万円 |
 | max_atr_pct | ATR が株価のこの%を超える荒い銘柄を除外 | 4.0 |
 | stop_atr | 最初の損切り = 買値 − ATR × この値 | 2.0 |

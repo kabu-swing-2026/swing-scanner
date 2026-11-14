@@ -259,6 +259,7 @@ if (LOCAL) $('localWarn').innerHTML = '<div class="banner bad">⚠ パソコン�
   'GitHub に公開した後、<b>https://(GitHubユーザー名).github.io/swing-scanner/sim.html</b> を開いてください。</div>';
 const ph = CFG.phase;
 $('phase').innerHTML = ph.level === 'stop' ? '<div class="banner bad">⛔ 相場判定：停止 — ルール上は新規の買いなし (練習として買うことはできます)</div>'
+  : ph.level === 'caution' && !ph.max_pos ? '<div class="banner warn">🟠 相場判定：注意 — ルール上は新規の買いお休み (練習として買うことはできます)</div>'
   : ph.level === 'caution' ? `<div class="banner warn">🟠 相場判定：注意 — 許容損失 ${CFG.phase_risk_pct}%・同時保有 最大${ph.max_pos}銘柄</div>`
   : `<div class="banner good">🟢 相場判定：通常 — 許容損失 ${CFG.phase_risk_pct}%・同時保有 最大${ph.max_pos}銘柄</div>`;
 
