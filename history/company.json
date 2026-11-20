@@ -1207,10 +1207,10 @@
   "fetched": "2026-11-19"
  },
  "8060.T": {
-  "marketCap": 821739454464,
-  "trailingPE": 18.859276,
-  "forwardPE": 10.611539,
-  "priceToBook": 2.0957327,
+  "marketCap": 821327626240,
+  "trailingPE": 18.849825,
+  "forwardPE": 10.606221,
+  "priceToBook": 2.0946825,
   "dividendYield": 2.27,
   "returnOnEquity": 0.119320005,
   "revenueGrowth": 0.063,
@@ -1218,14 +1218,18 @@
   "fullTimeEmployees": 18425,
   "website": "https://canon.jp",
   "longBusinessSummary": "Canon Marketing Japan Inc. engages in the marketing and sale of Canon products and related solutions in Japan. It operates through four segments: Consumers, Enterprise, Area, and Professional. The Consumers segment provides digital cameras and inkjet printers, and other products to individual consumers. The Enterprise segment sells input and output devices, and solutions to resolve management issues in large, mid-sized, and second-tier companies. The Area segment supplies input and output devices and solutions to help customer management issues primarily for small and medium-sized enterprises. The Professional segment provides feed and cut paper printers to the printing industry. It also provides semiconductor manufacturing systems, and inspection and measurement devices to semiconductor manufacturers and other electronics device manufacturers; and IT solutions, system development, network construction, and hardware services for the medical and healthcare fields. In addition, the company provides production printing services, as well as printing services, etc. The company was incorporated in 1950 and is headquartered in Tokyo, Japan. Canon Marketing Japan Inc. operates as a subsidiary of Canon Inc.",
-  "wiki": null,
-  "fetched": "2026-11-19"
+  "wiki": {
+   "title": "キヤノンマーケティングジャパン",
+   "extract": "キヤノンマーケティングジャパン株式会社 は、東京都港区に本社を置き、日本市場におけるキヤノンブランド製品の直販、卸売や修理などのサポートなどを行う日本の企業である。",
+   "url": "https://ja.wikipedia.org/wiki/%E3%82%AD%E3%83%A4%E3%83%8E%E3%83%B3%E3%83%9E%E3%83%BC%E3%82%B1%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0%E3%82%B8%E3%83%A3%E3%83%91%E3%83%B3"
+  },
+  "fetched": "2026-11-20"
  },
  "4194.T": {
-  "marketCap": 402990170112,
-  "trailingPE": 22.158876,
-  "forwardPE": 23.007376,
-  "priceToBook": 4.665233,
+  "marketCap": 394768351232,
+  "trailingPE": 21.521782,
+  "forwardPE": 22.53798,
+  "priceToBook": 4.5700526,
   "dividendYield": 0.0,
   "returnOnEquity": 0.24233,
   "revenueGrowth": 0.227,
@@ -1233,29 +1237,37 @@
   "fullTimeEmployees": 2967,
   "website": "https://www.visional.inc/ja/index.html",
   "longBusinessSummary": "Visional, Inc., together with its subsidiaries, provides human resources platform solutions in Japan. It operates through two segments, HR Tech and Incubation. The company provides BizReach, a membership based job change site that connects talent with companies; BizReach by HRMOS that generates internal resumes and position requirements, and achieving optimal matching between internal talent and positions; HRMOS Talent Management which manages all information related to employees, HR and organizational status; HRMOS Recruitment; HRMOS Attendance, an free cloud attendance management system; HRMOS Expenses, an enpense reimbursement system; Labor Management System, a cloud system that provides labor related tasks; and HRMOS Payroll, a cloud based payroll calculation system. It also offers SONAR by HRMOS; BIZREACH Campus; Onboard AI; Persona; M&A Succeed; TRABOX; Yamory; Assured Cloud Evaluation; TSUIDE; and Standby solutions. Visional, Inc. was incorporated in 2020 and is headquartered in Shibuya, Japan.",
-  "wiki": null,
-  "fetched": "2026-11-19"
+  "wiki": {
+   "title": "ビジョナル",
+   "extract": "株式会社ビズリーチ は、東京都渋谷区に本社を置き、インターネットを活用したサービス事業などを行う日本の企業。持株会社のビジョナル株式会社が東京証券取引所プライム市場に上場している。",
+   "url": "https://ja.wikipedia.org/wiki/%E3%83%93%E3%82%BA%E3%83%AA%E3%83%BC%E3%83%81"
+  },
+  "fetched": "2026-11-20"
  },
  "7459.T": {
-  "marketCap": 668544401408,
-  "trailingPE": 15.481607,
-  "forwardPE": 18.93553,
-  "priceToBook": 1.0851797,
+  "marketCap": 669977280512,
+  "trailingPE": 15.363313,
+  "forwardPE": 18.976114,
+  "priceToBook": 1.0875037,
   "dividendYield": 2.72,
   "returnOnEquity": 0.074149996,
-  "revenueGrowth": 0.034,
+  "revenueGrowth": 0.029,
   "operatingMargins": 0.01348,
   "fullTimeEmployees": 13024,
   "website": "https://www.medipal.co.jp",
   "longBusinessSummary": "MediPal Holdings Corporation engages in the prescription pharmaceutical wholesale business in Japan. The company engages in the manufacture and supply of medical drugs, medical devices, medical supplies, clinical test reagents, and medical equipment and materials; non-life insurance agency business; outsourcing of medical office administration services; research and development of preventive medicine and cutting-edge medical technologies; and construction of a medical materials database. It is also involved in the wholesale of cosmetics, daily necessities, and OTC pharmaceuticals; animal health products for companion animals; and food processing raw materials for agriculture, fisheries, and livestock. In addition, the company offers management and marketing support for insurance pharmacies; logistics contract; veterinary medicines and feed additives; and food processing raw materials, food ingredients, food additives, and chemical product materials. It serves hospitals, clinics, pharmacies, drugstores, home centers, convenience store, supermarkets, veterinary clinics, livestock and fisheries businesses, processed food manufacturers, and other medical facilities. The company was formerly known as Mediceo Paltac Holdings Co., Ltd. and changed its name to MediPal Holdings Corporation in October 2009. The company was founded in 1898 and is headquartered in Chuo, Japan.",
-  "wiki": null,
-  "fetched": "2026-11-19"
+  "wiki": {
+   "title": "メディパルホールディングス",
+   "extract": "株式会社メディパルホールディングス は、医薬、化粧、日用雑貨を扱う卸売企業グループの持株会社である。",
+   "url": "https://ja.wikipedia.org/wiki/%E3%83%A1%E3%83%87%E3%82%A3%E3%83%91%E3%83%AB%E3%83%9B%E3%83%BC%E3%83%AB%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%82%B9"
+  },
+  "fetched": "2026-11-20"
  },
  "4343.T": {
-  "marketCap": 62213623808,
-  "trailingPE": 19.549948,
-  "forwardPE": 28.85321,
-  "priceToBook": 7.0194783,
+  "marketCap": 60631080960,
+  "trailingPE": 19.052652,
+  "forwardPE": 28.119267,
+  "priceToBook": 6.8409224,
   "dividendYield": 0.33,
   "returnOnEquity": 0.35381,
   "revenueGrowth": 0.124,
@@ -1263,7 +1275,11 @@
   "fullTimeEmployees": 3955,
   "website": "https://www.fantasy.co.jp",
   "longBusinessSummary": "AEON Fantasy Co.,LTD. operates family-oriented amusement facilities in Japan, Malaysia, Thailand, the Philippines, Indonesia, Vietnam, and China. It also operates playgrounds and shopping malls. The company was formerly known as Jusco Co., Ltd. The company was incorporated in 1969 and is based in Chiba, Japan. AEON Fantasy Co.,LTD. operates as a subsidiary of Aeon Co., Ltd.",
-  "wiki": null,
-  "fetched": "2026-11-19"
+  "wiki": {
+   "title": "イオンファンタジー",
+   "extract": "株式会社イオンファンタジー は、千葉県千葉市美浜区の幕張新都心に本社を置く、大型ショッピングセンター内において「モーリーファンタジー」をはじめとする児童向け遊戯施設を運営するイオングループの企業である。",
+   "url": "https://ja.wikipedia.org/wiki/%E3%82%A4%E3%82%AA%E3%83%B3%E3%83%95%E3%82%A1%E3%83%B3%E3%82%BF%E3%82%B8%E3%83%BC"
+  },
+  "fetched": "2026-11-20"
  }
 }
