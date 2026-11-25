@@ -569,19 +569,23 @@
   "fetched": "2026-11-16"
  },
  "7181.T": {
-  "marketCap": 2055727087616,
-  "trailingPE": 12.503296,
-  "forwardPE": 8.283119,
-  "priceToBook": 0.44082394,
-  "dividendYield": 2.8,
-  "returnOnEquity": 0.03881,
-  "revenueGrowth": -0.05,
-  "operatingMargins": 0.20526,
-  "fullTimeEmployees": 18487,
-  "website": "https://www.jp-life.japanpost.jp",
-  "longBusinessSummary": "Japan Post Insurance Co., Ltd. engages in the provision of life insurance products and services in Japan. The company also offers agency services for other insurance companies, including foreign insurance companies and financial institutions; personal and asset accumulation pension insurances; and reinsurances, as well as handles the administration of postal life insurance contracts. In addition, the company is involved in the acquisition of real estate and securities, securities lending, and deposits businesses; information system design, development, maintenance, and operation contracting; and investment management business, such as investment advisory and agency business. It offers its products through directly managed sales offices and post offices to individual and corporate customers. The company was incorporated in 2006 and is headquartered in Tokyo, Japan.",
-  "wiki": null,
-  "fetched": "2026-11-16"
+  "marketCap": null,
+  "trailingPE": null,
+  "forwardPE": null,
+  "priceToBook": null,
+  "dividendYield": null,
+  "returnOnEquity": null,
+  "revenueGrowth": null,
+  "operatingMargins": null,
+  "fullTimeEmployees": null,
+  "website": null,
+  "longBusinessSummary": null,
+  "wiki": {
+   "title": "かんぽ生命保険",
+   "extract": "株式会社かんぽ生命保険 は、東京都千代田区大手町に本社を置く、日本郵政グループの生命保険会社。日本郵政の子会社。東証プライム上場企業。",
+   "url": "https://ja.wikipedia.org/wiki/%E3%81%8B%E3%82%93%E3%81%BD%E7%94%9F%E5%91%BD%E4%BF%9D%E9%99%BA"
+  },
+  "fetched": "2026-11-25"
  },
  "8227.T": {
   "marketCap": 765352083456,
@@ -1604,5 +1608,225 @@
    "url": "https://ja.wikipedia.org/wiki/%E6%97%A5%E6%9C%AC%E9%85%B8%E7%B4%A0%E3%83%9B%E3%83%BC%E3%83%AB%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%82%B9"
   },
   "fetched": "2026-11-24"
+ },
+ "5401.T": {
+  "marketCap": null,
+  "trailingPE": null,
+  "forwardPE": null,
+  "priceToBook": null,
+  "dividendYield": null,
+  "returnOnEquity": null,
+  "revenueGrowth": null,
+  "operatingMargins": null,
+  "fullTimeEmployees": null,
+  "website": null,
+  "longBusinessSummary": null,
+  "wiki": {
+   "title": "日本製鉄",
+   "extract": "日本製鉄株式会社 は、東京都千代田区丸の内に本社を置く、日本最大手の鉄鋼メーカー（高炉メーカー）。また日本製鉄グループ全体の事業持株会社である。日経平均株価およびTOPIX Large70、JPX日経インデックス400の構成銘柄の一つ。キャッチコピーは「世界は鉄でできている。」",
+   "url": "https://ja.wikipedia.org/wiki/%E6%97%A5%E6%9C%AC%E8%A3%BD%E9%89%84"
+  },
+  "fetched": "2026-11-25"
+ },
+ "3382.T": {
+  "marketCap": null,
+  "trailingPE": null,
+  "forwardPE": null,
+  "priceToBook": null,
+  "dividendYield": null,
+  "returnOnEquity": null,
+  "revenueGrowth": null,
+  "operatingMargins": null,
+  "fullTimeEmployees": null,
+  "website": null,
+  "longBusinessSummary": null,
+  "wiki": {
+   "title": "セブン&アイ・ホールディングス",
+   "extract": "株式会社セブン&アイ・ホールディングス は、セブン-イレブン・ジャパン、7-Eleven, Inc.（セブン-イレブン・インク）などを傘下に持つ日本の大手流通持株会社。東京都千代田区二番町に本社を置く。日経平均株価およびTOPIX Core30、JPX日経インデックス400の構成銘柄の一つ。",
+   "url": "https://ja.wikipedia.org/wiki/%E3%82%BB%E3%83%96%E3%83%B3%26%E3%82%A2%E3%82%A4%E3%83%BB%E3%83%9B%E3%83%BC%E3%83%AB%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%82%B9"
+  },
+  "fetched": "2026-11-25"
+ },
+ "1928.T": {
+  "marketCap": null,
+  "trailingPE": null,
+  "forwardPE": null,
+  "priceToBook": null,
+  "dividendYield": null,
+  "returnOnEquity": null,
+  "revenueGrowth": null,
+  "operatingMargins": null,
+  "fullTimeEmployees": null,
+  "website": null,
+  "longBusinessSummary": null,
+  "wiki": {
+   "title": "積水ハウス",
+   "extract": "積水ハウス株式会社 は、大阪府大阪市北区に本社を置く日本の大手住宅メーカーである。",
+   "url": "https://ja.wikipedia.org/wiki/%E7%A9%8D%E6%B0%B4%E3%83%8F%E3%82%A6%E3%82%B9"
+  },
+  "fetched": "2026-11-25"
+ },
+ "4768.T": {
+  "marketCap": null,
+  "trailingPE": null,
+  "forwardPE": null,
+  "priceToBook": null,
+  "dividendYield": null,
+  "returnOnEquity": null,
+  "revenueGrowth": null,
+  "operatingMargins": null,
+  "fullTimeEmployees": null,
+  "website": null,
+  "longBusinessSummary": null,
+  "wiki": {
+   "title": "大塚商会",
+   "extract": "株式会社大塚商会 は、東京都千代田区飯田橋に本社を置く、システムインテグレーション(SI)事業を展開するIT企業である。JPX日経インデックス400の構成銘柄の一つ。",
+   "url": "https://ja.wikipedia.org/wiki/%E5%A4%A7%E5%A1%9A%E5%95%86%E4%BC%9A"
+  },
+  "fetched": "2026-11-25"
+ },
+ "1878.T": {
+  "marketCap": null,
+  "trailingPE": null,
+  "forwardPE": null,
+  "priceToBook": null,
+  "dividendYield": null,
+  "returnOnEquity": null,
+  "revenueGrowth": null,
+  "operatingMargins": null,
+  "fullTimeEmployees": null,
+  "website": null,
+  "longBusinessSummary": null,
+  "wiki": {
+   "title": "大東建託",
+   "extract": "大東建託株式会社 は、東京都港区港南（品川駅前）に本社を置く建設および不動産会社。",
+   "url": "https://ja.wikipedia.org/wiki/%E5%A4%A7%E6%9D%B1%E5%BB%BA%E8%A8%97"
+  },
+  "fetched": "2026-11-25"
+ },
+ "3099.T": {
+  "marketCap": null,
+  "trailingPE": null,
+  "forwardPE": null,
+  "priceToBook": null,
+  "dividendYield": null,
+  "returnOnEquity": null,
+  "revenueGrowth": null,
+  "operatingMargins": null,
+  "fullTimeEmployees": null,
+  "website": null,
+  "longBusinessSummary": null,
+  "wiki": {
+   "title": "三越伊勢丹ホールディングス",
+   "extract": "株式会社三越伊勢丹ホールディングス は、東京都新宿区西新宿に本社を置く、日本の百貨店の純粋持株会社。同社傘下として三越伊勢丹（関東地方の店舗を運営）をはじめとする各地方の百貨店運営会社などを所有している。日経平均株価の構成銘柄の一つ。三井グループに属する。",
+   "url": "https://ja.wikipedia.org/wiki/%E4%B8%89%E8%B6%8A%E4%BC%8A%E5%8B%A2%E4%B8%B9%E3%83%9B%E3%83%BC%E3%83%AB%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%82%B9"
+  },
+  "fetched": "2026-11-25"
+ },
+ "9010.T": {
+  "marketCap": null,
+  "trailingPE": null,
+  "forwardPE": null,
+  "priceToBook": null,
+  "dividendYield": null,
+  "returnOnEquity": null,
+  "revenueGrowth": null,
+  "operatingMargins": null,
+  "fullTimeEmployees": null,
+  "website": null,
+  "longBusinessSummary": null,
+  "wiki": {
+   "title": "富士急行",
+   "extract": "富士急行株式会社 は、山梨県・静岡県東部・神奈川県西部を中心とする地域で、運輸（鉄道・バス・タクシー・船舶）、観光、不動産、流通事業などを営む会社である。富士急（ふじきゅう、Fujikyu）の愛称で知られている。本社は山梨県富士吉田市に所在し（最寄駅は富士急ハイランド駅）、登記上の本店は同市の富士山駅となっている。このほか東京都渋谷区にも東京本社を置いている。東証プライム市場上場。",
+   "url": "https://ja.wikipedia.org/wiki/%E5%AF%8C%E5%A3%AB%E6%80%A5%E8%A1%8C"
+  },
+  "fetched": "2026-11-25"
+ },
+ "8200.T": {
+  "marketCap": null,
+  "trailingPE": null,
+  "forwardPE": null,
+  "priceToBook": null,
+  "dividendYield": null,
+  "returnOnEquity": null,
+  "revenueGrowth": null,
+  "operatingMargins": null,
+  "fullTimeEmployees": null,
+  "website": null,
+  "longBusinessSummary": null,
+  "wiki": {
+   "title": "リンガーハット",
+   "extract": "株式会社リンガーハット は、日本の企業。グループでちゃんぽん店「リンガーハット」、とんかつ専門店「濵かつ」等の外食チェーン店等を展開する外食産業の事業持株会社である。東京都品川区大崎に東京本社を、長崎県長崎市鍛冶屋町に本店を置く。",
+   "url": "https://ja.wikipedia.org/wiki/%E3%83%AA%E3%83%B3%E3%82%AC%E3%83%BC%E3%83%8F%E3%83%83%E3%83%88"
+  },
+  "fetched": "2026-11-25"
+ },
+ "4534.T": {
+  "marketCap": null,
+  "trailingPE": null,
+  "forwardPE": null,
+  "priceToBook": null,
+  "dividendYield": null,
+  "returnOnEquity": null,
+  "revenueGrowth": null,
+  "operatingMargins": null,
+  "fullTimeEmployees": null,
+  "website": null,
+  "longBusinessSummary": null,
+  "wiki": {
+   "title": "持田製薬",
+   "extract": "持田製薬株式会社 は、東京都新宿区に本社を置き、主に医療用医薬品を開発・製造・販売する東京証券取引所プライム市場上場企業である。",
+   "url": "https://ja.wikipedia.org/wiki/%E6%8C%81%E7%94%B0%E8%A3%BD%E8%96%AC"
+  },
+  "fetched": "2026-11-25"
+ },
+ "7844.T": {
+  "marketCap": null,
+  "trailingPE": null,
+  "forwardPE": null,
+  "priceToBook": null,
+  "dividendYield": null,
+  "returnOnEquity": null,
+  "revenueGrowth": null,
+  "operatingMargins": null,
+  "fullTimeEmployees": null,
+  "website": null,
+  "longBusinessSummary": null,
+  "wiki": {
+   "title": "マーベラス (企業)",
+   "extract": "株式会社マーベラス は、東京都品川区東品川に本社を置き、オンラインゲーム・ゲームソフト・アニメソングの企画・制作・販売を主な事業内容とする日本の企業、ならびに同社のレコードレーベル。コンピュータエンターテインメント協会・日本アミューズメント産業協会・日本オンラインゲーム協会正会員。アニメやコミック等の知的財産権を活用した幅広いコンテンツの創出・制作を得意としている。東京証券取引所プライム市場上場企業。JPX日経中小型株指数の構成銘柄の一つ。",
+   "url": "https://ja.wikipedia.org/wiki/%E3%83%9E%E3%83%BC%E3%83%99%E3%83%A9%E3%82%B9_(%E4%BC%81%E6%A5%AD)"
+  },
+  "fetched": "2026-11-25"
+ },
+ "3708.T": {
+  "marketCap": null,
+  "trailingPE": null,
+  "forwardPE": null,
+  "priceToBook": null,
+  "dividendYield": null,
+  "returnOnEquity": null,
+  "revenueGrowth": null,
+  "operatingMargins": null,
+  "fullTimeEmployees": null,
+  "website": null,
+  "longBusinessSummary": null,
+  "wiki": null,
+  "fetched": "2026-11-25"
+ },
+ "6820.T": {
+  "marketCap": null,
+  "trailingPE": null,
+  "forwardPE": null,
+  "priceToBook": null,
+  "dividendYield": null,
+  "returnOnEquity": null,
+  "revenueGrowth": null,
+  "operatingMargins": null,
+  "fullTimeEmployees": null,
+  "website": null,
+  "longBusinessSummary": null,
+  "wiki": null,
+  "fetched": "2026-11-25"
  }
 }
